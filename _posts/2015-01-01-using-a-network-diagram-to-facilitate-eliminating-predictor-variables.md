@@ -18,7 +18,7 @@ The general steps:
 *Figure 1. Network diagram of 19 bioclimatic variables. The yellow circles represent temperature variables and the green circles represent precipitation variables. Two circles are linked if the two represented variables have a high correlation (\|r\|≥ 0.7). The selected variables are marked with red boundaries.*  
 
 *The network diagram is implemented in R, with raster and igraph libraries.
-~~~
+```
 #include igraph and raster libraries
 library(igraph)
 library(raster)
@@ -64,7 +64,7 @@ for (i in 12:19){
 }
 # Draw the network diagram
 tkplot(net)
-~~~
+```
 
 
 ## References:
