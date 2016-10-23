@@ -1,3 +1,7 @@
 	_site/
 _source/
 .Rproj.user
+.RData
+.Rhistory
+.shandongfx.github.io.Rproj
+test.r
