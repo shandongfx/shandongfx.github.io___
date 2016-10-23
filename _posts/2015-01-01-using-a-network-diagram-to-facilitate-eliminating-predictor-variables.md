@@ -17,7 +17,8 @@ The general steps:
 
 *Figure 1. Network diagram of 19 bioclimatic variables. The yellow circles represent temperature variables and the green circles represent precipitation variables. Two circles are linked if the two represented variables have a high correlation (\|r\|≥ 0.7). The selected variables are marked with red boundaries.*  
 
-*The network diagram is implemented in R, with raster and igraph libraries.
+*The network diagram is implemented in R, with raster and igraph libraries.  
+
 ```r
 #include igraph and raster libraries
 library(igraph)
@@ -28,10 +29,10 @@ library(raster)
 bioFiles <- list.files(path = "D:/projects/2012.IOZ.pheasant/2012.11-ioz-modify/9.rejected/layer4/prjArea_china_10m_asc/", pattern = ".asc$", recursive = FALSE, full.names=TRUE)
 bioRaster<- stack(bioFiles)
 
-# Build correlation matrix
+#Build correlation matrix
 m <- layerStats(bioRaster,'pearson',na.rm=TRUE)[[1]]
 
-# Set threshold for "high" correlation, here we used 0.7
+#Set threshold for "high" correlation, here we used 0.7
 m <- abs(m)
 m[m<0.7] <- 0
 
