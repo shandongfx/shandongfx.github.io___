@@ -14,5 +14,5 @@ layout: default
 
 * 2013 Fall, Introduction Biology Lab, Oklahoma State University, Stillwater, OK  
 
-  <img src="../figure/general/teach1.jpg" alt="teach1" style="width: 150px;" align="right" />  
+  <img src="../figure/general/teach1.jpg" alt="teach1" style="width: 200px;" align="right" />  
 
