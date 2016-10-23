@@ -4,7 +4,7 @@ title: Xiao Feng's Hyper-Volume Niche Space
 ---
 # {{ page.title }}  
 <hr>
-<img src="./figure/general/me.JPG" alt="Drawing" style="width: 200px;" align="right" />
+<img src="./figure/general/xf_photo.jpg" alt="Drawing" style="width: 200px;" align="right" />
 
 Hello, I'm Xiao Feng and I'm a PhD Candidate in the Department of Integrative Biology, Oklahoma State University, under guidance of [Dr. Monica Papeş](http://monapapes.wixsite.com/biodivmatters). I am interested in *Biogeography*, *Ecological Niche Model*, *Invasive Species*, and *Bayesian statistics*.
 
