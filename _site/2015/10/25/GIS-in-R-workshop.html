@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<title>Work with GIS data in R</title>
+			<!-- link to main stylesheet -->
+			<link rel="stylesheet" type="text/css" href="/css/main.css">
+		</head>
+		<body>
+			<nav>
+	    		<ul>
+	        		<li><a href="/">Home</a></li>
+					<li><a href="/publication">Publication</a></li>
+	        		<li><a href="/blog/">Research note</a></li>
+					<li><a href="/teaching/">Teaching</a></li>
+					
+
+	    		</ul>
+			</nav>
+			<div class="container">
+			
+			<h1>Work with GIS data in R</h1>
+<p class="meta">25 Oct 2015</p>
+
+<div class="post">
+  <p><em>The ducoment is based on the workshop I tought on Oct. 25 2015, Interdepartmental Workshop Series, Oklahoma State University, Stillwater, OK</em></p>
+
+<h2 id="basic">1. basic</h2>
+<p>Install and load libraries.</p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># install.packages("rgdal") 
+# install.packages("raster")
+# install.packages("dismo")
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"rgdal"</span><span class="p">)</span><span class="w"> </span><span class="c1"># this package is the basis of analyzing GIS data in R; for example, it handle basis coordinate systems, it defines a lot of spatial data types
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"raster"</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s2">"dismo"</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<h2 id="warm-up">2. warm up</h2>
+<p>R is pretty fun to use, let’s plot some maps from one line of code</p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">require</span><span class="p">(</span><span class="s2">"XML"</span><span class="p">)</span><span class="w">
+</span><span class="c1"># get a map of OK, you could type text that used to search on Google Maps
+</span><span class="n">myMap</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">gmap</span><span class="p">(</span><span class="s2">"oklahoma"</span><span class="p">)</span><span class="w">
+</span><span class="n">raster</span><span class="o">::</span><span class="n">plot</span><span class="p">(</span><span class="n">myMap</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-2-1.png" alt="plot of chunk unnamed-chunk-2" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># try different text
+</span><span class="n">plot</span><span class="p">(</span><span class="n">gmap</span><span class="p">(</span><span class="s2">"stillwater,OK"</span><span class="p">))</span><span class="w"> </span><span class="c1"># seems good
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># get a snapshot of Walmart (satellite image)
+</span><span class="n">plot</span><span class="p">(</span><span class="n">gmap</span><span class="p">(</span><span class="s2">"walmart,stillwater,OK"</span><span class="p">,</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"satellite"</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># get a snapshot of Boomer Lake (satellite image)
+</span><span class="n">plot</span><span class="p">(</span><span class="n">gmap</span><span class="p">(</span><span class="s2">"boomer lake,stillwater,OK"</span><span class="p">,</span><span class="n">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"satellite"</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5" /></p>
+
+<h2 id="spatial-points">3. spatial points</h2>
+<h3 id="generate-spatial-points">3.1 generate spatial points</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># get a map of OK 
+</span><span class="n">myMap</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">gmap</span><span class="p">(</span><span class="s2">"Oklahoma"</span><span class="p">,</span><span class="n">lonlat</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># show the extent of this map (raster)
+</span><span class="n">okExtent</span><span class="o">&lt;-</span><span class="w"> </span><span class="n">extent</span><span class="p">(</span><span class="n">myMap</span><span class="p">)</span><span class="w">
+</span><span class="n">okExtent</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## class       : Extent 
+## xmin        : -105.8468 
+## xmax        : -91.56882 
+## ymin        : 32.32014 
+## ymax        : 38.17344
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># generate 10 random points (longitude &amp; latitude) within this extent
+</span><span class="n">myLongitude</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">runif</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">min</span><span class="o">=</span><span class="n">okExtent</span><span class="p">[</span><span class="m">1</span><span class="p">]</span><span class="w"> </span><span class="p">,</span><span class="n">max</span><span class="o">=</span><span class="n">okExtent</span><span class="p">[</span><span class="m">2</span><span class="p">]</span><span class="w"> </span><span class="p">)</span><span class="w">
+</span><span class="n">myLatitude</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">runif</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="n">min</span><span class="o">=</span><span class="n">okExtent</span><span class="p">[</span><span class="m">3</span><span class="p">]</span><span class="w"> </span><span class="p">,</span><span class="n">max</span><span class="o">=</span><span class="n">okExtent</span><span class="p">[</span><span class="m">4</span><span class="p">]</span><span class="w"> </span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># combine longitude and latitude by column
+</span><span class="n">coords</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">cbind</span><span class="p">(</span><span class="n">myLongitude</span><span class="p">,</span><span class="n">myLatitude</span><span class="p">)</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##      myLongitude myLatitude
+## [1,]   -93.18914   32.95762
+## [2,]   -92.48202   37.80642
+## [3,]   -92.46151   36.58885
+## [4,]   -91.66047   36.91385
+## [5,]  -103.81525   35.04244
+## [6,]   -99.83805   37.12114
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># make the points spatial
+</span><span class="n">myPoints</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">SpatialPoints</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># plot the points
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myPoints</span><span class="p">)</span><span class="w"> </span><span class="c1"># but there is no background
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-9-1.png" alt="plot of chunk unnamed-chunk-9" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># add some background
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myMap</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myPoints</span><span class="p">,</span><span class="w"> </span><span class="n">add</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-10-1.png" alt="plot of chunk unnamed-chunk-10" /></p>
+
+<h3 id="generate-spatial-points-with-attribute-column">3.2 generate spatial points with attribute column</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># generate random attribute for the points
+</span><span class="n">myAtt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">sample</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s2">"presence"</span><span class="p">,</span><span class="s2">"absence"</span><span class="p">),</span><span class="m">10</span><span class="p">,</span><span class="n">replace</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># change myAtt to DataFrame
+</span><span class="n">myAtt</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.data.frame</span><span class="p">(</span><span class="n">myAtt</span><span class="p">)</span><span class="w">
+</span><span class="n">head</span><span class="p">(</span><span class="n">myAtt</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##      myAtt
+## 1  absence
+## 2  absence
+## 3 presence
+## 4 presence
+## 5  absence
+## 6  absence
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># make spatial data frame (spatial points with attributes)
+</span><span class="n">myPoints</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">SpatialPointsDataFrame</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span><span class="n">as.data.frame</span><span class="p">(</span><span class="n">myAtt</span><span class="p">))</span><span class="w">
+
+</span><span class="c1"># show the attribute of myPoints
+</span><span class="n">myPoints</span><span class="o">@</span><span class="n">data</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##       myAtt
+## 1   absence
+## 2   absence
+## 3  presence
+## 4  presence
+## 5   absence
+## 6   absence
+## 7   absence
+## 8  presence
+## 9   absence
+## 10  absence
+</code></pre>
+</div>
+
+<h3 id="select-a-subset-of-points-based-on-attributes">3.3 select a subset of points based on attributes</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># This is like subsetting a dataframe
+</span><span class="n">myPoints_presence</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">myPoints</span><span class="p">[</span><span class="n">myPoints</span><span class="o">$</span><span class="n">myAtt</span><span class="o">==</span><span class="s2">"presence"</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
+
+</span><span class="c1"># plot the previously selected points as red
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myPoints</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myPoints_presence</span><span class="p">,</span><span class="n">add</span><span class="o">=</span><span class="nb">T</span><span class="p">,</span><span class="n">col</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12" /></p>
+
+<h3 id="save-our-selected-file-as-a-shape-file">3.4 save our selected file as a shape file</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># the 1st parameter is the object, the 2nd parameter is the path and file name
+</span><span class="n">shapefile</span><span class="p">(</span><span class="n">myPoints_presence</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s2">"temp/output.shp"</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span><span class="c1">#file.exists("output.shp")
+</span></code></pre>
+</div>
+
+<h2 id="spatial-polygons">4. spatial polygons</h2>
+
+<h3 id="build-buffer-of-points-the-unit-of-width-depends-on-the-geographic-reference-system-of-mypoints">4.1 build buffer of points, the unit of width depends on the geographic reference system of “myPoints”</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># build a dissolved buffer
+</span><span class="n">myBuffer</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">buffer</span><span class="p">(</span><span class="n">myPoints</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="m">1</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## Loading required namespace: rgeos
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="nf">length</span><span class="p">(</span><span class="n">myBuffer</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## [1] 1
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">plot</span><span class="p">(</span><span class="n">myBuffer</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-14-1.png" alt="plot of chunk unnamed-chunk-14" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># build buffer independently for each point
+</span><span class="n">myBuffer</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">buffer</span><span class="p">(</span><span class="n">myPoints</span><span class="p">,</span><span class="n">width</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="n">dissolve</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+</span><span class="nf">length</span><span class="p">(</span><span class="n">myBuffer</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## [1] 10
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">plot</span><span class="p">(</span><span class="n">myBuffer</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-14-2.png" alt="plot of chunk unnamed-chunk-14" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># plot them
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myMap</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-14-3.png" alt="plot of chunk unnamed-chunk-14" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">plot</span><span class="p">(</span><span class="n">myPoints</span><span class="p">,</span><span class="n">add</span><span class="o">=</span><span class="nb">T</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myBuffer</span><span class="p">,</span><span class="n">add</span><span class="o">=</span><span class="nb">T</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-14-4.png" alt="plot of chunk unnamed-chunk-14" /></p>
+
+<h3 id="load-existing-polygons-data-from-httpwwwdiva-gisorgdata">4.2 load existing polygons (data from <a href="http://www.diva-gis.org/Data">http://www.diva-gis.org/Data</a>)</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># use the shapefile function, which is used for export if the object is specified
+</span><span class="n">map_state</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">shapefile</span><span class="p">(</span><span class="s2">"data/USA_adm1.shp"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># show the summary of the data
+</span><span class="n">summary</span><span class="p">(</span><span class="n">map_state</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## Object of class SpatialPolygonsDataFrame
+## Coordinates:
+##          min       max
+## x -179.15056 179.77341
+## y   18.90986  71.39069
+## Is projected: FALSE 
+## proj4string :
+## [+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0]
+## Data attributes:
+##       ID_0         ISO               NAME_0               ID_1     
+##  Min.   :234   Length:51          Length:51          Min.   :3191  
+##  1st Qu.:234   Class :character   Class :character   1st Qu.:3204  
+##  Median :234   Mode  :character   Mode  :character   Median :3216  
+##  Mean   :234                                         Mean   :3216  
+##  3rd Qu.:234                                         3rd Qu.:3228  
+##  Max.   :234                                         Max.   :3241  
+##     NAME_1           VARNAME_1          NL_NAME_1        
+##  Length:51          Length:51          Length:51         
+##  Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character  
+##                                                          
+##                                                          
+##                                                          
+##     HASC_1              CC_1              TYPE_1         
+##  Length:51          Length:51          Length:51         
+##  Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character  
+##                                                          
+##                                                          
+##                                                          
+##   ENGTYPE_1          VALIDFR_1          VALIDTO_1        
+##  Length:51          Length:51          Length:51         
+##  Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character  
+##                                                          
+##                                                          
+##                                                          
+##   REMARKS_1           Shape_Leng         Shape_Area       
+##  Length:51          Min.   :  0.6128   Min.   :  0.01725  
+##  Class :character   1st Qu.: 21.4184   1st Qu.:  9.81765  
+##  Mode  :character   Median : 23.6599   Median : 14.65424  
+##                     Mean   : 47.5481   Mean   : 21.94257  
+##                     3rd Qu.: 33.5381   3rd Qu.: 23.71332  
+##                     Max.   :802.6560   Max.   :281.24187
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># show the structure of the data
+</span><span class="n">head</span><span class="p">(</span><span class="n">map_state</span><span class="o">@</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">=</span><span class="m">5</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##   ID_0 ISO        NAME_0 ID_1     NAME_1 VARNAME_1 NL_NAME_1 HASC_1 CC_1
+## 0  234 USA United States 3191    Alabama   AL|Ala.      &lt;NA&gt;  US.AL &lt;NA&gt;
+## 1  234 USA United States 3192     Alaska AK|Alaska      &lt;NA&gt;  US.AK &lt;NA&gt;
+## 2  234 USA United States 3193    Arizona  AZ|Ariz.      &lt;NA&gt;  US.AZ &lt;NA&gt;
+## 3  234 USA United States 3194   Arkansas   AR|Ark.      &lt;NA&gt;  US.AR &lt;NA&gt;
+## 4  234 USA United States 3195 California CA|Calif.      &lt;NA&gt;  US.CA &lt;NA&gt;
+##   TYPE_1 ENGTYPE_1 VALIDFR_1 VALIDTO_1 REMARKS_1 Shape_Leng Shape_Area
+## 0  State     State  18170815   Present      &lt;NA&gt;   21.48773   12.86700
+## 1  State     State  18671011   Present      &lt;NA&gt;  802.65598  281.24187
+## 2  State     State  18670118   Present      &lt;NA&gt;   23.75283   28.93142
+## 3  State     State  18360615   Present      &lt;NA&gt;   21.57045   13.58124
+## 4  State     State  18500909   Present      &lt;NA&gt;   56.41121   41.64743
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># show one colume
+</span><span class="n">map_state</span><span class="o">$</span><span class="n">NAME_1</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##  [1] "Alabama"              "Alaska"               "Arizona"             
+##  [4] "Arkansas"             "California"           "Colorado"            
+##  [7] "Connecticut"          "Delaware"             "District of Columbia"
+## [10] "Florida"              "Georgia"              "Hawaii"              
+## [13] "Idaho"                "Illinois"             "Indiana"             
+## [16] "Iowa"                 "Kansas"               "Kentucky"            
+## [19] "Louisiana"            "Maine"                "Maryland"            
+## [22] "Massachusetts"        "Michigan"             "Minnesota"           
+## [25] "Mississippi"          "Missouri"             "Montana"             
+## [28] "Nebraska"             "Nevada"               "New Hampshire"       
+## [31] "New Jersey"           "New Mexico"           "New York"            
+## [34] "North Carolina"       "North Dakota"         "Ohio"                
+## [37] "Oklahoma"             "Oregon"               "Pennsylvania"        
+## [40] "Rhode Island"         "South Carolina"       "South Dakota"        
+## [43] "Tennessee"            "Texas"                "Utah"                
+## [46] "Vermont"              "Virginia"             "Washington"          
+## [49] "West Virginia"        "Wisconsin"            "Wyoming"
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># plot the data
+</span><span class="n">plot</span><span class="p">(</span><span class="n">map_state</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-15-1.png" alt="plot of chunk unnamed-chunk-15" /></p>
+
+<h3 id="subset">4.3 subset</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># only select Oklahoma
+</span><span class="n">map_ok</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">map_state</span><span class="p">[</span><span class="n">map_state</span><span class="o">$</span><span class="n">NAME_1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"Oklahoma"</span><span class="p">,</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">map_ok</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-16-1.png" alt="plot of chunk unnamed-chunk-16" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># select states large area (&gt; 30)
+# step 1: do the logic judgement
+</span><span class="n">selection</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">map_state</span><span class="o">$</span><span class="n">Shape_Area</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">30</span><span class="w">
+</span><span class="c1"># step 2: subset
+</span><span class="n">map_selected</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">map_state</span><span class="p">[</span><span class="n">selection</span><span class="p">,]</span><span class="w">
+
+</span><span class="c1"># the following code shows the same results, but I will nor run it.
+#map_selected &lt;- map_state[map_state$Shape_Area &lt; 10,]
+</span><span class="w">
+</span><span class="c1"># show all columns/fields/attributes of the selections
+</span><span class="n">map_selected</span><span class="o">@</span><span class="n">data</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##    ID_0 ISO        NAME_0 ID_1     NAME_1 VARNAME_1 NL_NAME_1 HASC_1 CC_1
+## 1   234 USA United States 3192     Alaska AK|Alaska      &lt;NA&gt;  US.AK &lt;NA&gt;
+## 4   234 USA United States 3195 California CA|Calif.      &lt;NA&gt;  US.CA &lt;NA&gt;
+## 26  234 USA United States 3217    Montana  MT|Mont.      &lt;NA&gt;  US.MT &lt;NA&gt;
+## 31  234 USA United States 3222 New Mexico   NM|N.M.      &lt;NA&gt;  US.NM &lt;NA&gt;
+## 43  234 USA United States 3234      Texas   TX|Tex.      &lt;NA&gt;  US.TX &lt;NA&gt;
+##    TYPE_1 ENGTYPE_1 VALIDFR_1 VALIDTO_1 REMARKS_1 Shape_Leng Shape_Area
+## 1   State     State  18671011   Present      &lt;NA&gt;  802.65598  281.24187
+## 4   State     State  18500909   Present      &lt;NA&gt;   56.41121   41.64743
+## 26  State     State  18640526   Present      &lt;NA&gt;   35.40539   45.08773
+## 31  State     State  18630224   Present      &lt;NA&gt;   23.65993   30.88773
+## 43  State     State  18500909   Present      &lt;NA&gt;   99.63551   65.18626
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">plot</span><span class="p">(</span><span class="n">map_selected</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-16-2.png" alt="plot of chunk unnamed-chunk-16" /></p>
+
+<h3 id="save-polygons">4.4 save polygons</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">shapefile</span><span class="p">(</span><span class="n">map_selected</span><span class="p">,</span><span class="s2">"temp/selected_states.shp"</span><span class="p">,</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<h2 id="spatial-raster">5. spatial raster</h2>
+
+<h3 id="readwrite-raster-files-data-from-httpwwwworldclimorg">5.1 read/write raster files (data from <a href="http://www.worldclim.org">http://www.worldclim.org</a>)</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># read one raster layer
+</span><span class="n">myLayer</span><span class="o">&lt;-</span><span class="w"> </span><span class="n">raster</span><span class="p">(</span><span class="s2">"data/bio1.bil"</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myLayer</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-18-1.png" alt="plot of chunk unnamed-chunk-18" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># write one raster layer (not run)
+# writeRaster(myLayer,filename="temp/ok_bio1.bil",format="EHdr",overwrite=TRUE)
+</span><span class="w">
+</span><span class="c1"># load several raster layers
+# step 1 get a list of file names
+</span><span class="n">list.files</span><span class="p">(</span><span class="s2">"data/"</span><span class="p">)</span><span class="w"> </span><span class="c1"># we need to filter the names
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##  [1] "bio1.bil"       "bio1.hdr"       "bio10.bil"      "bio10.hdr"     
+##  [5] "bio11.bil"      "bio11.hdr"      "bio12.bil"      "bio12.hdr"     
+##  [9] "bio13.bil"      "bio13.hdr"      "bio14.bil"      "bio14.hdr"     
+## [13] "bio15.bil"      "bio15.hdr"      "bio16.bil"      "bio16.hdr"     
+## [17] "bio17.bil"      "bio17.hdr"      "bio18.bil"      "bio18.hdr"     
+## [21] "bio19.bil"      "bio19.hdr"      "bio2.bil"       "bio2.hdr"      
+## [25] "bio3.bil"       "bio3.hdr"       "bio4.bil"       "bio4.hdr"      
+## [29] "bio5.bil"       "bio5.hdr"       "bio6.bil"       "bio6.hdr"      
+## [33] "bio7.bil"       "bio7.hdr"       "bio8.bil"       "bio8.hdr"      
+## [37] "bio9.bil"       "bio9.hdr"       "USA_adm0.dbf"   "USA_adm0.prj"  
+## [41] "USA_adm0.sbn"   "USA_adm0.sbx"   "USA_adm0.shp"   "USA_adm0.shx"  
+## [45] "USA_adm1.dbf"   "USA_adm1.prj"   "USA_adm1.sbn"   "USA_adm1.sbx"  
+## [49] "USA_adm1.shp"   "USA_adm1.shx"   "USA_adm2.dbf"   "USA_adm2.prj"  
+## [53] "USA_adm2.sbn"   "USA_adm2.sbx"   "USA_adm2.shp"   "USA_adm2.shx"  
+## [57] "USA_readme.txt"
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">list.files</span><span class="p">(</span><span class="s2">"data/"</span><span class="p">,</span><span class="n">pattern</span><span class="o">=</span><span class="s2">".bil"</span><span class="p">)</span><span class="w"> </span><span class="c1"># the names are correct, but we need the full path
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##  [1] "bio1.bil"  "bio10.bil" "bio11.bil" "bio12.bil" "bio13.bil"
+##  [6] "bio14.bil" "bio15.bil" "bio16.bil" "bio17.bil" "bio18.bil"
+## [11] "bio19.bil" "bio2.bil"  "bio3.bil"  "bio4.bil"  "bio5.bil" 
+## [16] "bio6.bil"  "bio7.bil"  "bio8.bil"  "bio9.bil"
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">list.files</span><span class="p">(</span><span class="s2">"data/"</span><span class="p">,</span><span class="n">pattern</span><span class="o">=</span><span class="s2">".bil"</span><span class="p">,</span><span class="w"> </span><span class="n">full.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w"> </span><span class="c1"># the full name give you a relative path to current working directory
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##  [1] "data/bio1.bil"  "data/bio10.bil" "data/bio11.bil" "data/bio12.bil"
+##  [5] "data/bio13.bil" "data/bio14.bil" "data/bio15.bil" "data/bio16.bil"
+##  [9] "data/bio17.bil" "data/bio18.bil" "data/bio19.bil" "data/bio2.bil" 
+## [13] "data/bio3.bil"  "data/bio4.bil"  "data/bio5.bil"  "data/bio6.bil" 
+## [17] "data/bio7.bil"  "data/bio8.bil"  "data/bio9.bil"
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">myFiles</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">list.files</span><span class="p">(</span><span class="s2">"data/"</span><span class="p">,</span><span class="n">pattern</span><span class="o">=</span><span class="s2">".bil"</span><span class="p">,</span><span class="w"> </span><span class="n">full.names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w"> 
+
+</span><span class="c1"># step 2 treat them as raster stack
+</span><span class="n">myLayers</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">stack</span><span class="p">(</span><span class="n">myFiles</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myLayers</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-18-2.png" alt="plot of chunk unnamed-chunk-18" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># save several raster layers
+</span><span class="n">formattedNames</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">paste</span><span class="p">(</span><span class="s2">"temp/"</span><span class="p">,</span><span class="nf">names</span><span class="p">(</span><span class="n">myLayers</span><span class="p">),</span><span class="s2">".bil"</span><span class="p">,</span><span class="w"> </span><span class="n">sep</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span><span class="w">
+</span><span class="n">formattedNames</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##  [1] "temp/bio1.bil"  "temp/bio10.bil" "temp/bio11.bil" "temp/bio12.bil"
+##  [5] "temp/bio13.bil" "temp/bio14.bil" "temp/bio15.bil" "temp/bio16.bil"
+##  [9] "temp/bio17.bil" "temp/bio18.bil" "temp/bio19.bil" "temp/bio2.bil" 
+## [13] "temp/bio3.bil"  "temp/bio4.bil"  "temp/bio5.bil"  "temp/bio6.bil" 
+## [17] "temp/bio7.bil"  "temp/bio8.bil"  "temp/bio9.bil"
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># not run
+# writeRaster(myLayers,filename= formattedNames, format="EHdr", bylayer=TRUE)
+</span></code></pre>
+</div>
+
+<h3 id="extraction-by-polygon">5.2 extraction by polygon</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># we only want to show Oklahoma, extract raster layer by polygon
+</span><span class="n">raster_ok</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">mask</span><span class="p">(</span><span class="n">myLayer</span><span class="p">,</span><span class="w"> </span><span class="n">map_ok</span><span class="p">)</span><span class="w"> </span><span class="c1"># we may get error if the reference systems are different
+</span></code></pre>
+</div>
+
+<h3 id="projection">5.3 projection</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># check their CRS
+</span><span class="n">crs</span><span class="p">(</span><span class="n">myLayer</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## CRS arguments:
+##  +proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">crs</span><span class="p">(</span><span class="n">map_ok</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## CRS arguments:
+##  +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># unify the CRS
+</span><span class="n">map_ok_new</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">spTransform</span><span class="p">(</span><span class="n">map_ok</span><span class="p">,</span><span class="w"> </span><span class="n">crs</span><span class="p">(</span><span class="n">myLayer</span><span class="p">))</span><span class="w">
+</span><span class="n">crs</span><span class="p">(</span><span class="n">map_ok_new</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## CRS arguments:
+##  +proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># extract raster by polygon 
+</span><span class="n">raster_ok</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">crop</span><span class="p">(</span><span class="w"> </span><span class="n">myLayer</span><span class="w"> </span><span class="p">,</span><span class="n">extent</span><span class="p">(</span><span class="n">map_ok_new</span><span class="p">)</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="c1"># first cut by a rectangle
+</span><span class="n">raster_ok</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">mask</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">,</span><span class="w"> </span><span class="n">map_ok_new</span><span class="p">)</span><span class="w"> </span><span class="c1"># then cut by boundary
+</span><span class="n">plot</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-20-1.png" alt="plot of chunk unnamed-chunk-20" /></p>
+
+<h3 id="extract-by-point">5.4 extract by point</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">extract</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">,</span><span class="n">myPoints</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>##  [1]  NA  NA  NA  NA  NA  NA 158 162  NA  NA
+</code></pre>
+</div>
+
+<h3 id="resample">5.5 resample</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># we want the new layer to be 3 times coarser at each axis (9 times coarser)
+# read current resolution
+</span><span class="n">raster_ok</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## class       : RasterLayer 
+## dimensions  : 20, 51, 1020  (nrow, ncol, ncell)
+## resolution  : 0.1666667, 0.1666667  (x, y)
+## extent      : -103, -94.5, 33.66667, 37  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=longlat +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +no_defs 
+## data source : in memory
+## names       : bio1 
+## values      : 122, 173  (min, max)
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">nrow</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## [1] 20
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ncol</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## [1] 51
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">extent</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>## class       : Extent 
+## xmin        : -103 
+## xmax        : -94.5 
+## ymin        : 33.66667 
+## ymax        : 37
+</code></pre>
+</div>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># define new resolution
+</span><span class="n">newRaster</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">raster</span><span class="p">(</span><span class="w"> </span><span class="n">nrow</span><span class="o">=</span><span class="w"> </span><span class="n">nrow</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">)</span><span class="o">/</span><span class="m">3</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">ncol</span><span class="o">=</span><span class="w"> </span><span class="n">ncol</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">)</span><span class="o">/</span><span class="m">3</span><span class="w"> </span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># define extent
+</span><span class="n">extent</span><span class="p">(</span><span class="n">newRaster</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">extent</span><span class="p">(</span><span class="n">raster_ok</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># fill the new layer with new values
+</span><span class="n">newRaster</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">resample</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">raster_ok</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">newRaster</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">'bilinear'</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">newRaster</span><span class="p">)</span><span class="w"> </span><span class="c1"># new layer seems coarser
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-22-1.png" alt="plot of chunk unnamed-chunk-22" /></p>
+
+<h3 id="reclassify-raster-layer">5.6 reclassify raster layer</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># we want to classify the world into two classes based on temperature, high &gt; mean &amp; low &lt; mean
+</span><span class="n">myLayer</span><span class="o">&lt;-</span><span class="w"> </span><span class="n">raster</span><span class="p">(</span><span class="s2">"data/bio1.bil"</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># values smaller than meanT becomes 1; values larger than meanT will be 2
+</span><span class="n">myMethod</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="o">-</span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w">  </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="kc">Inf</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w">
+</span><span class="n">myLayer_classified</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">reclassify</span><span class="p">(</span><span class="n">myLayer</span><span class="p">,</span><span class="n">rcl</span><span class="o">=</span><span class="w"> </span><span class="n">myMethod</span><span class="p">)</span><span class="w">
+</span><span class="n">plot</span><span class="p">(</span><span class="n">myLayer_classified</span><span class="p">)</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-23-1.png" alt="plot of chunk unnamed-chunk-23" /></p>
+
+<h3 id="raster-calculation">5.7 raster calculation</h3>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># read precipitation data 
+</span><span class="n">wet</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">raster</span><span class="p">(</span><span class="s2">"data/bio13.bil"</span><span class="p">)</span><span class="w"> </span><span class="c1"># precipitation of wettest month
+</span><span class="n">dry</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">raster</span><span class="p">(</span><span class="s2">"data/bio14.bil"</span><span class="p">)</span><span class="w"> </span><span class="c1"># precipitation of driest month
+</span><span class="n">plot</span><span class="p">(</span><span class="n">stack</span><span class="p">(</span><span class="n">wet</span><span class="p">,</span><span class="n">dry</span><span class="p">))</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-24-1.png" alt="plot of chunk unnamed-chunk-24" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># calculate the difference
+</span><span class="n">diff</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">wet</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">dry</span><span class="w">
+</span><span class="c1">#plot(diff)
+</span><span class="w">
+</span><span class="c1"># calculate the mean of the two month
+</span><span class="n">twoLayers</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">stack</span><span class="p">(</span><span class="n">wet</span><span class="p">,</span><span class="n">dry</span><span class="p">)</span><span class="w">
+</span><span class="n">meanPPT</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">calc</span><span class="p">(</span><span class="n">twoLayers</span><span class="p">,</span><span class="n">fun</span><span class="o">=</span><span class="n">mean</span><span class="p">)</span><span class="w">
+</span><span class="c1">#plot(meanPPT)
+</span><span class="w">
+</span><span class="c1"># the following code gives the same results
+</span><span class="n">meanPPT2</span><span class="w"> </span><span class="o">&lt;-</span><span class="w">  </span><span class="p">(</span><span class="n">wet</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dry</span><span class="p">)</span><span class="o">/</span><span class="m">2</span><span class="w">
+
+</span><span class="c1"># histogram of one layer
+</span><span class="n">hist</span><span class="p">(</span><span class="n">twoLayers</span><span class="p">[[</span><span class="m">1</span><span class="p">]])</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-24-2.png" alt="plot of chunk unnamed-chunk-24" /></p>
+
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># correlation between different layers
+</span><span class="n">pairs</span><span class="p">(</span><span class="n">twoLayers</span><span class="p">[[</span><span class="m">1</span><span class="o">:</span><span class="m">2</span><span class="p">]])</span><span class="w">
+</span></code></pre>
+</div>
+
+<p><img src="/figure/source/2015-10-25-GIS-in-R-workshop/2015-10-25-GIS-in-R-workshop/unnamed-chunk-24-3.png" alt="plot of chunk unnamed-chunk-24" /></p>
+
+<p>################################</p>
+
+<h2 id="references">References:</h2>
+<ul>
+  <li>Spatial data in R: Using R as a GIS <a href="http://pakillo.github.io/R-GIS-tutorial/">http://pakillo.github.io/R-GIS-tutorial/</a></li>
+  <li>Hijmans RJ (2014) Raster: geographic data analysis and modeling.cran.r-project.org/web/packages/raster/ (accessed 1 Nov 2014)</li>
+  <li>CRAN Task View: Analysis of Spatial Data <a href="https://cran.r-project.org/web/views/Spatial.html">https://cran.r-project.org/web/views/Spatial.html</a></li>
+</ul>
+
+
+</div>
+
+			
+			</div><!-- /.container -->
+			<footer>
+<h5> Copyright 2015-2016 by Xiao Feng </h5>
+			</footer>
+		</body>
+	</html>
