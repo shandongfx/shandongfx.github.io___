@@ -5,7 +5,7 @@ layout: default
 ## {{ page.title }}  
 <hr>
 
-5. **Feng, X.**, Papeş, M. (2016). Physiological limits in an ecological niche modeling framework: a case study of water temperature and salinity constraints of freshwater bivalves invasive in USA. Ecological Modelling, Accepted.
+5. **Feng, X.**, Papeş, M. (2016). Physiological limits in an ecological niche modeling framework: a case study of water temperature and salinity constraints of freshwater bivalves invasive in USA. Ecological Modelling. Accepted.
 
 4. Bried, JT, Siepielski, AM, Dvorett, D, Jog, SK, Patten, MA, **Feng, X**, Davis CA. (2016). Species residency status affects model selection and hypothesis testing in freshwater community ecology. Freshwater Biology. DOI: 10.1111/fwb.12800  
 
