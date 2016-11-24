@@ -1,0 +1,225 @@
+---
+title: "Ecological niche modelling in R - part 1"
+author: "Xiao Feng"
+date: "November 23, 2016"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+There are severl ENM/SDM packages in literature, but [dismo](https://cran.r-project.org/web/packages/dismo/index.html) is the very first and very useful package that include a lot of basic functions in ENM. Other packages may help you automatically do a lot works, but dismo is the one that help you understand what is going on underneath process of data manupulation & niche modeling. Personally, I think dismo is a great tool for methodological studies if your study involves parameter manipulations or a lot of repeated workflows (e.g. a lot of species). 
+
+
+
+```r
+# Load dismo library
+library(dismo)
+```
+
+```
+## Loading required package: methods
+```
+
+```
+## Loading required package: raster
+```
+
+```
+## Loading required package: sp
+```
+
+# 1. occurrences
+
+## 1.1 Load occurrences  
+Typically, there are two ways to get occurrences: 1) load a local csv file into R; 2) download observations from online databases, e.g. [GBIF](http://gbif.org) . There is a *gbif()* function can help automatically download species' occurrences without clicking or searching on GBIF website. The parameters provided by *gbif()* give you a lot flexibilities. See this simple example below.
+
+```r
+#simply type in the species' scientific name
+ occ <- gbif("Dasypus novemcinctus")
+ write.csv(occ,"d:/temp/Dasypus_novemcinctus.csv")
+#read.csv("d:/temp/Dasypus_novemcinctus.csv")
+```
+
+You may also automatically go over a list of species you are interested.
+
+```r
+species_list <- c("Dasypus kappleri",
+                  "Dasypus hybridus",
+                  "Dasypus novemcinctus")
+for (i in 1:length(species_list)){
+   occ <- gbif( species_list[i] )  # download i-th species and save data
+   write.csv(occ,paste("d:/temp/",species_list[i],".csv",sep=""))
+}
+```
+
+Most commonly, we load a csv file from local disk.
+
+```r
+occ <- read.csv("d:/temp/Dasypus_novemcinctus.csv")
+```
+
+## 1.2 Manipulate occurrences  
+We always need to clean the occurrences. Here I showed a few functions frequently used for my work.
+
+Example of removing duplicated records according to the columns of lon & lat.
+
+```r
+# check duplicates
+dup_results <- duplicated(occ[c("lon","lat")])
+table(dup_results)  # TRUE: not unique record, FALSE: unique record
+```
+
+```
+## dup_results
+## FALSE  TRUE 
+##  1733  2630
+```
+
+```r
+nrow(occ)  # original records number
+```
+
+```
+## [1] 4363
+```
+
+```r
+occ_unique <- occ[!dup_results,]
+nrow(occ_unique)  # updated records number
+```
+
+```
+## [1] 1733
+```
+
+Example of subseting records by attributes (column).
+
+```r
+# remove NA values 
+occ_updated <- subset(occ_unique, (!is.na(lon)) | (!is.na(lat)) )
+
+# select by year
+occ_selected <- subset(occ_unique,year==2016)  # select records in 2016
+
+occ_selected <- subset(occ_unique,year>=1950 & year <=2000)  # between 1950~2000
+
+occ_selected <- subset(occ_unique,year<1950 | year >2000)  # before 1950 or after 2000
+
+occ_selected <- subset(occ_unique,year>=1950  # a combination of more conditions
+                       & year <=2000 
+                       & lat > 0)
+```
+
+## 1.3 Make occurrences spatial!
+Pay attention to the grammar.  
+(1) Use **<- ~**, not **<-**.  
+(2) "lon" and "lat" are column names from the data.frame.  
+(3) make sure x/longitude first.  
+
+
+
+```r
+coordinates( occ_updated ) <- ~ lon + lat
+class(occ_updated)
+```
+
+```
+## [1] "SpatialPointsDataFrame"
+## attr(,"package")
+## [1] "sp"
+```
+
+With R, we can easily transform spatial data into shape files, which may be used in ArcGIS or QGIS for plotting purpose.
+
+```r
+shapefile(occ_updated,"d:/temp/occ.shp")
+occ_updated <- shapefile("d:/temp/occ.shp")
+```
+
+
+# 2. Raster files
+I used worldclim dataset as an example. Please refer to my  [**GIS Tutorial**](http://lab.fengxiao.info/2015/10/25/GIS-in-R-workshop.html) for more examples of raster analysis in R.  
+
+```r
+# load two layers: annual T. & P.
+basemap <- stack(c("d:/Xiao/GISDATA/climate/WC/WorldClim_10arcmin_bil/bio1.bil"),
+                 "d:/Xiao/GISDATA/climate/WC/WorldClim_10arcmin_bil/bio12.bil")
+
+# Extract the raster to North & South America
+extent <- c(-180,-30,-60,80)
+basemap <- crop(basemap,extent) 
+plot(basemap)
+```
+
+![plot of chunk unnamed-chunk-10](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-10-1.png)
+
+Plot occurrences on the base map.
+
+```r
+# It is always good to unify the coordinate reference system (CRS). There is a good document about CRS 
+# https://www.nceas.ucsb.edu/~frazier/RSpatialGuides/OverviewCoordinateReferenceSystems.pdf
+crs(occ_updated) <- crs(basemap)  # Here I directly assign WGS84 to occurrences; but if you have different CRS, you need to transform one to the other.
+plot(basemap[[1]])
+plot(occ_updated,add=TRUE,col="red")
+```
+
+![plot of chunk unnamed-chunk-11](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-11-1.png)
+
+It seems some points are not located on the landmass, which should have NA values. Let's remove them.
+
+```r
+extracted <- extract(basemap[[1]],occ_updated)
+table(is.na(extracted))  # There are a few points have NA values
+```
+
+```
+## 
+## FALSE  TRUE 
+##  1729     3
+```
+
+```r
+occ_updated <- occ_updated[!is.na(extracted), ]
+plot(basemap[[1]])
+plot(occ_updated,add=TRUE,col="red")  # Yes, they disappeared.
+```
+
+![plot of chunk unnamed-chunk-12](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-12-1.png)
+
+# 3. Train models in R
+## 3.1 Maxent
+The following 3 conditions are important for running maxent in R.  
+(1) Install **rJava** package.  
+(2) I suggest use 32-bit R, because I assume there is an issue of rJava for 64-bit R.   
+(3) Also, we must download and copy the maxent.jar into a special folder, typically it is the *java* folder under *dismo* folder. In my case, it is:
+**D:/Program Files/R/R-3.3.1/library/dismo/java/maxent.jar**  
+
+There are two ways to run Maxent. One way is similar as the method when we run the interface of maxent, we need occurrence points and rasters; the other way is provide a data.frame with environmental conditions for presences and pseudo-absences.  
+
+Example of the 1st method. Different from the maxent interface, training model, projecting model, and evaluating model are typically independent steps. 
+
+
+```r
+# training model
+myModel <- maxent(x=basemap,p=occ_updated)
+
+# projecting model 
+prediction_now <- predict (myModel, basemap)
+
+# make future temperature warmer & wetter
+futuremap <- basemap + 100
+prediction_future <- predict (myModel, futuremap)
+plot(stack(prediction_now,prediction_future))
+```
+
+![plot of chunk unnamed-chunk-13](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-13-1.png)
+
+# More examples to be added:
+* seperate occurrences into training and testing
+* manipulate training area
+* run maxent with data.frame
+* manipulate maxent parameters, e.g. beta, features, clamping, output folder
+
+
+# References:  
+* Robert J. Hijmans and Jane Elith (2016) Species distribution modeling with R https://cran.r-project.org/web/packages/dismo/vignettes/sdm.pdf

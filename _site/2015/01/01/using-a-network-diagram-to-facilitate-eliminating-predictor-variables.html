@@ -38,57 +38,58 @@ selection and colinearity (Dormann et al. 2013). Because highly correlated predi
   </li>
 </ul>
 
-<p><img src="http://localhost:4000/figure/old_post/fig.1.jpg" alt="network1" style="width: 300px;" align="middle" /></p>
+<p><img src="/figure/old_post/fig.1.jpg" alt="network1" style="width: 300px;" align="middle" /></p>
 
 <p><em>Figure 1. Network diagram of 19 bioclimatic variables. The yellow circles represent temperature variables and the green circles represent precipitation variables. Two circles are linked if the two represented variables have a high correlation (|r|≥ 0.7). The selected variables are marked with red boundaries.</em></p>
 
 <p>*The network diagram is implemented in R, with raster and igraph libraries.</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>#include igraph and raster libraries
-library(igraph)
-library(raster)
 
-#load predictor variables
+<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1">#include igraph and raster libraries
+</span><span class="n">library</span><span class="p">(</span><span class="n">igraph</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span><span class="w">
+
+</span><span class="c1">#load predictor variables
 #bioFiles &lt;- list.files(path = "path for variable", pattern = ".asc$", recursive = FALSE, full.names=TRUE)
-bioFiles &lt;- list.files(path = "D:/projects/2012.IOZ.pheasant/2012.11-ioz-modify/9.rejected/layer4/prjArea_china_10m_asc/", pattern = ".asc$", recursive = FALSE, full.names=TRUE)
-bioRaster&lt;- stack(bioFiles)
+</span><span class="n">bioFiles</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">list.files</span><span class="p">(</span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"D:/projects/2012.IOZ.pheasant/2012.11-ioz-modify/9.rejected/layer4/prjArea_china_10m_asc/"</span><span class="p">,</span><span class="w"> </span><span class="n">pattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">".asc$"</span><span class="p">,</span><span class="w"> </span><span class="n">recursive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">full.names</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span><span class="n">bioRaster</span><span class="o">&lt;-</span><span class="w"> </span><span class="n">stack</span><span class="p">(</span><span class="n">bioFiles</span><span class="p">)</span><span class="w">
 
-# Build correlation matrix
-m &lt;- layerStats(bioRaster,'pearson',na.rm=TRUE)[[1]]
+</span><span class="c1">#Build correlation matrix
+</span><span class="n">m</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">layerStats</span><span class="p">(</span><span class="n">bioRaster</span><span class="p">,</span><span class="s1">'pearson'</span><span class="p">,</span><span class="n">na.rm</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)[[</span><span class="m">1</span><span class="p">]]</span><span class="w">
 
-# Set threshold for "high" correlation, here we used 0.7
-m &lt;- abs(m)
-m[m&lt;0.7] &lt;- 0
+</span><span class="c1">#Set threshold for "high" correlation, here we used 0.7
+</span><span class="n">m</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">abs</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="w">
+</span><span class="n">m</span><span class="p">[</span><span class="n">m</span><span class="o">&lt;</span><span class="m">0.7</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">0</span><span class="w">
 
-#
+</span><span class="c1">#
 #m&lt;-m*10
+</span><span class="w">
+</span><span class="c1"># Link variables
+</span><span class="n">net</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">graph.adjacency</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">"undirected"</span><span class="p">,</span><span class="n">weighted</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="n">diag</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
 
-# Link variables
-net &lt;- graph.adjacency(m,mode="undirected",weighted=TRUE,diag=FALSE)
-
-for (i in 1:11){
-    tt&lt;-paste("bio",i,sep="")
-	for(j in 1:length(V(net)$name)){
-		if ( V(net)$name[j]==tt){
-			# set up color for the first 11 variables
-			V(net)$color[[j]] &lt;- "yellow"
-			# set up node size for the first 11 variables
-			V(net)$size[[j]] &lt;- 18
-			break
-			}
-	}
-}
-for (i in 12:19){
-    tt&lt;-paste("bio",i,sep="")
-	for(j in 1:length(V(net)$name)){
-		if ( V(net)$name[j]==tt){
-			V(net)$color[[j]]&lt;-"green"
-			V(net)$size[[j]]&lt;-18
-		}
-	}
-}
-# Draw the network diagram
-tkplot(net)
-</code></pre>
+</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="m">11</span><span class="p">){</span><span class="w">
+    </span><span class="n">tt</span><span class="o">&lt;-</span><span class="n">paste</span><span class="p">(</span><span class="s2">"bio"</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span><span class="w">
+	</span><span class="k">for</span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">name</span><span class="p">)){</span><span class="w">
+		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">==</span><span class="n">tt</span><span class="p">){</span><span class="w">
+			</span><span class="c1"># set up color for the first 11 variables
+</span><span class="w">			</span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">color</span><span class="p">[[</span><span class="n">j</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">"yellow"</span><span class="w">
+			</span><span class="c1"># set up node size for the first 11 variables
+</span><span class="w">			</span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">size</span><span class="p">[[</span><span class="n">j</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">18</span><span class="w">
+			</span><span class="k">break</span><span class="w">
+			</span><span class="p">}</span><span class="w">
+	</span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">12</span><span class="o">:</span><span class="m">19</span><span class="p">){</span><span class="w">
+    </span><span class="n">tt</span><span class="o">&lt;-</span><span class="n">paste</span><span class="p">(</span><span class="s2">"bio"</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span><span class="w">
+	</span><span class="k">for</span><span class="p">(</span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="o">:</span><span class="nf">length</span><span class="p">(</span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">name</span><span class="p">)){</span><span class="w">
+		</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">name</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">==</span><span class="n">tt</span><span class="p">){</span><span class="w">
+			</span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">color</span><span class="p">[[</span><span class="n">j</span><span class="p">]]</span><span class="o">&lt;-</span><span class="s2">"green"</span><span class="w">
+			</span><span class="n">V</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="o">$</span><span class="n">size</span><span class="p">[[</span><span class="n">j</span><span class="p">]]</span><span class="o">&lt;</span><span class="m">-18</span><span class="w">
+		</span><span class="p">}</span><span class="w">
+	</span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span><span class="c1"># Draw the network diagram
+</span><span class="n">tkplot</span><span class="p">(</span><span class="n">net</span><span class="p">)</span><span class="w">
+</span></code></pre>
 </div>
 
 <h2 id="references">References:</h2>
@@ -106,5 +107,16 @@ tkplot(net)
 			<footer>
 <h5> Copyright 2015-2016 by Xiao Feng </h5>
 			</footer>
+			<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-86239714-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
 		</body>
 	</html>
