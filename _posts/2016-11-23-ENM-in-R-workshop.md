@@ -1,11 +1,6 @@
 ---
 title: "Ecological niche modelling in R - part 1"
-layout: default
-author: "Xiao Feng"
-date: "November 23, 2016"
-output:
-  pdf_document: default
-  html_notebook: default
+layout: post
 ---
 
 There are severl ENM/SDM packages in literature, but [dismo](https://cran.r-project.org/web/packages/dismo/index.html) is the very first and very useful package that include a lot of basic functions in ENM. Other packages may help you automatically do a lot works, but dismo is the one that help you understand what is going on underneath process of data manupulation & niche modeling. Personally, I think dismo is a great tool for methodological studies if your study involves parameter manipulations or a lot of repeated workflows (e.g. a lot of species). 
@@ -152,7 +147,7 @@ basemap <- crop(basemap,extent)
 plot(basemap)
 ```
 
-![plot of chunk unnamed-chunk-10](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-10-1.png)
+![plot of chunk unnamed-chunk-10](/figure/source/2016-11-23-ENM-in-R-workshop/2016-11-23-ENM-in-R-workshop/unnamed-chunk-10-1.png)
 
 Plot occurrences on the base map.
 
@@ -164,7 +159,7 @@ plot(basemap[[1]])
 plot(occ_updated,add=TRUE,col="red")
 ```
 
-![plot of chunk unnamed-chunk-11](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-11-1.png)
+![plot of chunk unnamed-chunk-11](/figure/source/2016-11-23-ENM-in-R-workshop/2016-11-23-ENM-in-R-workshop/unnamed-chunk-11-1.png)
 
 It seems some points are not located on the landmass, which should have NA values. Let's remove them.
 
@@ -185,7 +180,7 @@ plot(basemap[[1]])
 plot(occ_updated,add=TRUE,col="red")  # Yes, they disappeared.
 ```
 
-![plot of chunk unnamed-chunk-12](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-12](/figure/source/2016-11-23-ENM-in-R-workshop/2016-11-23-ENM-in-R-workshop/unnamed-chunk-12-1.png)
 
 # 3. Train models in R
 ## 3.1 Maxent
@@ -213,7 +208,7 @@ prediction_future <- predict (myModel, futuremap)
 plot(stack(prediction_now,prediction_future))
 ```
 
-![plot of chunk unnamed-chunk-13](/figure/source/2016-11-23-ENM-in-R-workshop/unnamed-chunk-13-1.png)
+![plot of chunk unnamed-chunk-13](/figure/source/2016-11-23-ENM-in-R-workshop/2016-11-23-ENM-in-R-workshop/unnamed-chunk-13-1.png)
 
 # More examples to be added:
 * seperate occurrences into training and testing

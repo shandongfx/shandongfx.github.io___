@@ -1,7 +1,7 @@
-	_site/
-_source/
+_site
+_site/
+_site/*
 .Rproj.user
 .RData
 .Rhistory
 .shandongfx.github.io.Rproj
-test.r
