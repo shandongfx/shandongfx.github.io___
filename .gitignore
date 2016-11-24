@@ -1,6 +1,4 @@
-_site
 _site/
-_site/*
 .Rproj.user
 .RData
 .Rhistory
