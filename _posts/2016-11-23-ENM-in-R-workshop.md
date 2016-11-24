@@ -1,5 +1,6 @@
 ---
 title: "Ecological niche modelling in R - part 1"
+layout: default
 author: "Xiao Feng"
 date: "November 23, 2016"
 output:
