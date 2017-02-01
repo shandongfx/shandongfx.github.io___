@@ -5,7 +5,9 @@ layout: default
 ## {{ page.title }}  
 <hr>
 
-5. **Feng, X.**, Papeş, M. (2016). Physiological limits in an ecological niche modeling framework: a case study of water temperature and salinity constraints of freshwater bivalves invasive in USA. Ecological Modelling, 346:48-57. doi: 10.1016/j.ecolmodel.2016.11.008  
+6. **Feng, X.**, Castro, MC, McBee, K and Papeş, M. (In press) Hiding in a cool climatic niche in the Tropics? An assessment of the ecological biogeography of the hairy long-nosed armadillo (Dasypus pilosus). Tropical Conservation Sciences.  
+
+5. **Feng, X.**, Papeş, M. (2017). Physiological limits in an ecological niche modeling framework: a case study of water temperature and salinity constraints of freshwater bivalves invasive in USA. Ecological Modelling, 346:48-57. doi: 10.1016/j.ecolmodel.2016.11.008  
 
 4. Bried, JT, Siepielski, AM, Dvorett, D, Jog, SK, Patten, MA, **Feng, X**, Davis CA. (2016). Species residency status affects model selection and hypothesis testing in freshwater community ecology. Freshwater Biology, 61: 1568–1579. doi: 10.1111/fwb.12800  
 
