@@ -4,7 +4,7 @@ layout: default
 ---
 ## {{ page.title }}  
 <hr>
-7. Jog, SK, Bried, JT, **Feng, X**, Dzialowski, AR, Papeş, M and Davis, CA (2016) Species residency status affects model selection and hypothesis testing in freshwater community ecology. Freshwater Biology, 61: 1568–1579. doi: 10.1111/fwb.12800  
+7. Jog, SK, Bried, JT, **Feng, X**, Dzialowski, AR, Papeş, M and Davis, CA (2016) Can land use indicate wetland floristic quality and taxonomic distinctness? Ecological Indicators, 78:331-339  
 
 6. **Feng, X**, Castro, MC, McBee, K and Papeş, M (2017) Hiding in a cool climatic niche in the Tropics? An assessment of the ecological biogeography of the hairy long-nosed armadillo (*Dasypus pilosus*). Tropical Conservation Sciences. doi: 10.1177/1940082917697249  
 
