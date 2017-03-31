@@ -5,6 +5,8 @@ layout: default
 ## {{ page.title }}  
 <hr>
 
+* 2017 Spring, Mammalogy Lab, Oklahoma State University, Stillwater, OK  
+
 * 2015 Nov. 23, Ecological niche modelling in R - part 1, Oklahoma State University, Stillwater, OK [view it online]({{ site.url }}/2016/11/23/ENM-in-R-workshop.html)  
 
 * 2015 Oct. 25, Using GIS data in R, Interdepartmental Workshop Series, Oklahoma State University, Stillwater, OK [view it online]({{ site.url }}/2015/10/25/GIS-in-R-workshop.html)  
