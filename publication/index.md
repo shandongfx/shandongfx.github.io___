@@ -4,6 +4,9 @@ layout: default
 ---
 ## {{ page.title }}  
 <hr>
+
+8. **Feng, X**, Papeş, M (in press) Can incomplete knowledge of species’ physiology facilitate ecological niche modeling? A case study with virtual species. Diversity and Distributions.
+
 7. Jog, SK, Bried, JT, **Feng, X**, Dzialowski, AR, Papeş, M and Davis, CA (2017) Can land use indicate wetland floristic quality and taxonomic distinctness? Ecological Indicators, 78:331-339  
 
 6. **Feng, X**, Castro, MC, McBee, K and Papeş, M (2017) Hiding in a cool climatic niche in the Tropics? An assessment of the ecological biogeography of the hairy long-nosed armadillo (*Dasypus pilosus*). Tropical Conservation Sciences. doi: 10.1177/1940082917697249  
