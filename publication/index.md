@@ -5,6 +5,8 @@ layout: default
 ## {{ page.title }}  
 <hr>
 
+9. **Feng, X**, Castro, M, Linde, E and Papeş, M. (in press) Armadillo Mapper: a case study of an online application to update potential distribution estimates. Tropical Conservation Science.  [Link to the online ENM application](armadillomapper.fengxiao.info)  
+
 8. **Feng, X**, Papeş, M (in press) Can incomplete knowledge of species’ physiology facilitate ecological niche modeling? A case study with virtual species. Diversity and Distributions.
 
 7. Jog, SK, Bried, JT, **Feng, X**, Dzialowski, AR, Papeş, M and Davis, CA (2017) Can land use indicate wetland floristic quality and taxonomic distinctness? Ecological Indicators, 78:331-339  
