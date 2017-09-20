@@ -215,6 +215,8 @@ plot(stack(prediction_now,prediction_future))
 * manipulate training area
 * run maxent with data.frame
 * manipulate maxent parameters, e.g. beta, features, clamping, output folder
+	
+ {% include google_ana_1.html %}
 
 
 # References:  
