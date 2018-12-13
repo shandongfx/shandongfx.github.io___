@@ -5,7 +5,7 @@ layout: default
 ## {{ page.title }}  
 <hr>
 
-* 2018 December, NIMBioS Tutorial - Ecological Niche Modeling, TN [view it online](http://lab.fengxiao.info/NIMBioSENM/)  
+* 2018 December, NIMBioS Tutorial - Ecological Niche Modeling, Knoxville, TN [view it online](http://lab.fengxiao.info/NIMBioSENM/)  
 
 * 2017 Spring, Mammalogy Lab, Oklahoma State University, Stillwater, OK  
 
