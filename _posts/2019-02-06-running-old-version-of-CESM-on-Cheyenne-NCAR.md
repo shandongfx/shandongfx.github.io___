@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  running old version of CESM (1.3) on Cheyenne @NCAR
+title:  running older version of CESM (1.3) on Cheyenne @NCAR
 ---
-Here I kept some notes on how to run an oder version of CESM on the new HPC at NCAR (Cheyenne). I mainly followed the guideline on [Google doc](https://docs.google.com/document/d/1V5_oIA_ZPmLsMKp0rZlQ99CqQshx2pqcZsVQhT7lCb0/edit#), which is organized by [Jim Edwards](https://staff.ucar.edu/users/jedwards).  
+Here I kept some notes on how to run an older version of CESM on the new HPC at NCAR (i.e., Cheyenne). I mainly followed the guideline on [Google doc](https://docs.google.com/document/d/1V5_oIA_ZPmLsMKp0rZlQ99CqQshx2pqcZsVQhT7lCb0/edit#), which is organized by [Jim Edwards](https://staff.ucar.edu/users/jedwards).  
 
 ## I used mainly 4 steps:  
 ### 1. copy two files to source code folder/scripts/ccsm_utils/Machines  
@@ -35,16 +35,16 @@ Here I kept some notes on how to run an oder version of CESM on the new HPC at N
 ```
 
 ### 3. check & revise a few script that may have a bad syntax  
-look for the following code (or similar structure) “foreach $var qw(a b c)”,  
-change it to “foreach $var (qw(a b c))”     
-i.e. add () outside qw  
+look for the following code (or similar structure) `foreach $var qw(a b c)`,  
+change it to `foreach $var (qw(a b c))`     
+i.e. add `()` outside `qw`  
 
-The following files are worth checking, and I only found one case in "models/drv/bld/build-namelist"  
+The following files are worth checking, and I only found one case in `models/drv/bld/build-namelist`  
 ccsm_utils/Case.template/ConfigCase.pm   
 ccsm_utils/Tools/cesm_setup   
 models/drv/bld/build-namelist   
 
-### 4. after create a new case, add “#PBS -A XXXXXAccountNumberXXXXX” to cesm1.3_CASENAME.run   
+### 4. after create a new case, add `#PBS -A XXXXXAccountNumberXXXXX` to `cesm1.3_CASENAME.run`   
 
 Note that, after submit the job, there will be only one active job, which is different from CESM2.0 that has an additional archive job.    
 
