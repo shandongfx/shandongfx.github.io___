@@ -31,7 +31,6 @@ layout: default
 2. **Feng, X**, C Lin, H Qiao, L Ji. (2015). Assessment of climatically suitable area for Syrmaticus reevesii under climate change. Endangered Species Research, 28: 19-31.  
 
 1. **Feng, X** and M Papeş. (2015). Ecological niche modelling confirms potential north-east range expansion of the nine-banded armadillo (Dasypus novemcinctus) in the USA. Journal of Biogeography, 42: 803-807.  
-
 {: reversed="reversed"}
 
 
