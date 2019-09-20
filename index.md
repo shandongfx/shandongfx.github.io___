@@ -6,7 +6,7 @@ title: Xiao Feng's Hyper-Volume Niche Space
 <hr>
 <img src="./figure/general/xf_photo.jpg" alt="Drawing" style="width: 200px;" align="right" />
 
-Hello, I'm Xiao Feng and I'm a postdoc in the [Institute of Environment, University of Arizona](https://bbcs.arizona.edu). I am interested in *Biogeography*, *Ecological Niche Model*, *Invasive Species*, Ecoclimate Teleconnection, and *Bayesian statistics*.
+Hello, I'm Xiao Feng and I'm a postdoc in the [Institute of Environment, University of Arizona](https://bbcs.arizona.edu). I am interested in *Biogeography*, *Ecological Niche Model*, *Invasive Species*, *Ecoclimate Teleconnection*, and *Bayesian statistics*.
 
 *Contact info:*  
 *Address: ENR2, Building 137, Room N582, 1064 E. Lowell St., P.O. Box 210137, Tucson, AZ, 85721-0137*  
