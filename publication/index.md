@@ -4,6 +4,7 @@ layout: default
 ---
 ## {{ page.title }}  
 
+## Accepted/Published  
 14. **Feng, X**, DS Park, C Walker, AT Peterson, C Merow, M Papes. (2019). Lessons from non-reproducible ecological niche models: a schema for maximizing scientific reproducibility. Nature Ecology & Evolution, DOI: 10.1038/s41559-019-0972-5  
 
 13. **Feng, X**, DS Park, R Pandey, Y Liang and M Papeş. (2019). New perspectives shed light on the confusion about collinearity in Maxent modeling. Ecology & Evolution, DOI: 10.1002/ece3.5555  
