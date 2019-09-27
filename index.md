@@ -19,7 +19,7 @@ Find me also on:
 </a>  <a href="https://www.researchgate.net/profile/Xiao_Feng" target="_blank">
 <img src="./figure/general/researchgate.png" alt="Drawing" style="width: 50px;"  />
 </a>  <a href="https://github.com/shandongfx" target="_blank">
-<img src="./figure/general/githublogo.png" alt="Drawing" style="width: 70px;"  />
+<img src="./figure/general/githublogo.png" alt="Drawing" style="width: 50px;"  />
 </a>
 
 
