@@ -18,6 +18,8 @@ Find me also on:
 <img src="./figure/general/googlelogo_color_270x104dp.png" alt="Drawing" style="width: 100px;"  />
 </a>  <a href="https://www.researchgate.net/profile/Xiao_Feng" target="_blank">
 <img src="./figure/general/researchgate.png" alt="Drawing" style="width: 50px;"  />
-</a>  
+</a>  <a href="https://github.com/shandongfx" target="_blank">
+<img src="./figure/general/githublogo.png" alt="Drawing" style="width: 100px;"  />
+</a>
 
 
